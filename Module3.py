@@ -101,9 +101,6 @@ def merge_files(df_dict, export_df):
         # Drop the redundant 'Account Nbr' column (based on lookup_columns)
         export_df = export_df.drop(columns=lookup_columns[0])
 
-        # Fill missing values with empty strings
-        export_df = export_df.fillna('')
-
     # Define the condition and subtract 12 if the condition is met
     export_df['New Spread'] = ''
         
@@ -115,6 +112,8 @@ def merge_files(df_dict, export_df):
     export_df['Who?'] = ''
     export_df['Notes'] = ''
 
+    # Fill missing values with empty strings
+    export_df = export_df.fillna('')
     cols = [
         'AccountNo',
         'Owner',
