@@ -5,8 +5,6 @@ from io import StringIO
 from Module1 import process_file  # Import the cleaning function from Module1.py
 from Module2 import process_and_export_data  # Import the whole_process function from Module2.py
 from Module3 import merge_files
-# Apply the Times New Roman font to the title using custom CSS
-import streamlit as st
 
 # Inject custom CSS to style the buttons
 st.markdown(
