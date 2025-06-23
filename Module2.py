@@ -1,7 +1,32 @@
 from Module1 import classify_value
 import pandas as pd
+import streamlit as st
+
+def custom_interleave(a, b):
+    result = []
+    pattern = [3, 'b', 2, 'b', 1, 'b', 2, 'b']
+    a_idx, b_idx = 0, 0
+
+    for p in pattern:
+        if isinstance(p, int):  # take p elements from a
+            result.extend(a[a_idx:a_idx+p])
+            a_idx += p
+        elif p == 'b':  # take 1 element from b
+            if b_idx < len(b):
+                result.append(b[b_idx])
+                b_idx += 1
+    return result
 
 def process_and_export_data(lines_split_into_words):
+    
+    combined_list = []
+    for i in range(0, len(lines_split_into_words), 2):
+        a = lines_split_into_words[i]
+        b = lines_split_into_words[i+1] if i+1 < len(lines_split_into_words) else []
+        combined = custom_interleave(a, b)
+        combined_list.append(combined)
+    
+    '''
     # Step 1: Iterate backwards through the data list
     for i in range(len(lines_split_into_words) - 1, 0, -2):  # Start from the second-to-last item, step -2
         # Insert values from the current row (lines_split_into_words[i]) into the previous row (lines_split_into_words[i-1])
@@ -12,9 +37,9 @@ def process_and_export_data(lines_split_into_words):
 
         # Delete the current row (lines_split_into_words[i])
         del lines_split_into_words[i]
-
+    '''
     # Step 2: Process date and loan number for each sublist
-    for sublist in lines_split_into_words:
+    for sublist in combined_list:
         date = sublist[1]  # The second column is the date
         loan_num = sublist[0]  # The first column is the loan number
 
@@ -35,9 +60,8 @@ def process_and_export_data(lines_split_into_words):
     # Step 3: Classify and convert all values in the sublists (handle negatives and classification)
     modified_data = [
         [classify_value(value) for value in row]
-        for row in lines_split_into_words
+        for row in combined_list
     ]
-
     # Step 4: Define the column names for the DataFrame
     cols = [
         "AccountNo",
@@ -56,8 +80,10 @@ def process_and_export_data(lines_split_into_words):
         "BK"
     ]
 
+
     # Step 5: Create the DataFrame
     export_df = pd.DataFrame(modified_data, columns=cols)
+    
 
     # First, create the new column 'Shtg + Def/ Surplus' by adding 'Surplus/Shortage' and 'Deficiency Amt'
     export_df['Shtg + Def/ Surplus'] = export_df['Surplus/Shortage'] + export_df['Deficiency Amt']
